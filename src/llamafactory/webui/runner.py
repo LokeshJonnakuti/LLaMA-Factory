@@ -25,6 +25,7 @@ from ..extras.packages import is_gradio_available
 from .common import DEFAULT_CACHE_DIR, DEFAULT_CONFIG_DIR, get_save_dir, load_config
 from .locales import ALERTS, LOCALES
 from .utils import abort_leaf_process, gen_cmd, get_eval_results, get_trainer_info, load_args, save_args, save_cmd
+from security import safe_command
 
 
 if is_gradio_available():
@@ -301,7 +302,7 @@ class Runner:
             if args.get("deepspeed", None) is not None:
                 env["FORCE_TORCHRUN"] = "1"
 
-            self.trainer = Popen("llamafactory-cli train {}".format(save_cmd(args)), env=env, shell=True)
+            self.trainer = safe_command.run(Popen, "llamafactory-cli train {}".format(save_cmd(args)), env=env, shell=True)
             yield from self.monitor()
 
     def _form_config_dict(self, data: Dict["Component", Any]) -> Dict[str, Any]:
