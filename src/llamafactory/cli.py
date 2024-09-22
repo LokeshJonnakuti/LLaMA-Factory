@@ -27,6 +27,7 @@ from .extras.logging import get_logger
 from .extras.misc import get_device_count
 from .train.tuner import export_model, run_exp
 from .webui.interface import run_web_demo, run_web_ui
+from security import safe_command
 
 
 USAGE = (
@@ -91,8 +92,7 @@ def main():
             master_addr = os.environ.get("MASTER_ADDR", "127.0.0.1")
             master_port = os.environ.get("MASTER_PORT", str(random.randint(20001, 29999)))
             logger.info("Initializing distributed tasks at: {}:{}".format(master_addr, master_port))
-            subprocess.run(
-                (
+            safe_command.run(subprocess.run, (
                     "torchrun --nnodes {nnodes} --node_rank {node_rank} --nproc_per_node {nproc_per_node} "
                     "--master_addr {master_addr} --master_port {master_port} {file_name} {args}"
                 ).format(
